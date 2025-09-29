@@ -1,7 +1,11 @@
+import os
 import streamlit as st
 from utils.load_data import load_all_data, load_reviews
 from utils.geospatial import get_dguid_from_latlon
 from sections import population_stats, competitors, hospitals, sentiment_physio
+
+if "MAPBOX_API_KEY" in st.secrets:
+    os.environ["MAPBOX_API_KEY"] = st.secrets["MAPBOX_API_KEY"]
 
 st.set_page_config(page_title="Arrow Physio Dashboard", layout="wide")
 
