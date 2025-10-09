@@ -7,3 +7,4 @@ geopy==2.4.1
 pydeck==0.8.1b0
 vaderSentiment==3.3.2
 requests==2.32.3
+geopandas==0.14.3
