@@ -2,6 +2,7 @@
 import streamlit as st
 import pandas as pd
 import requests
+import os 
 
 from utils.load_data import load_all_data, load_reviews
 from utils.geospatial import get_dguid_from_latlon
@@ -13,6 +14,15 @@ from sections import sentiment_physio
 
 st.set_page_config(page_title="Arrow Physio Dashboard", layout="wide")
 st.title("📍 Arrow Physio Market Insights")
+
+def get_gcp_key():
+    # Use secrets.toml locally
+    if "general" in st.secrets and "gcp_api_key" in st.secrets["general"]:
+        return st.secrets["general"]["gcp_api_key"]
+    # Use env var on Cloud Run
+    return os.getenv("gcp_api_key")
+
+gcp_api_key = get_gcp_key()
 
 # -------------------------
 # Google Maps Geocoding function
