@@ -5,8 +5,11 @@ import numpy as np
 from geopy.distance import geodesic
 import geopandas as gpd
 import re
-import pydeck as pdk  # <-- added for the map
+import pydeck as pdk
 
+# --------------------------
+# Regex patterns for facility filtering
+# --------------------------
 PAT_INCLUDE = re.compile(
     r"(hospital|emergency|urgent\s*care|walk[-\s]?in|after[-\s]?hours|"
     r"medical\s*(centre|center|clinic)|primary\s*care|doctor\b|physician\b|"
@@ -16,7 +19,9 @@ PAT_INCLUDE = re.compile(
 PAT_EXCLUDE = re.compile(r"(chiro|chiropractic|osteopath|osteopathy|massage|spa\b|acupuncture|naturopath)", re.I)
 ALLOWLIST = ["pinpoint health", "infinity health", "appletree", "jack nathan"]
 
-
+# --------------------------
+# Helper functions
+# --------------------------
 def _ensure_lat_lon(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     lat_col = next((c for c in df.columns if c.lower() in ("latitude", "lat")), None)
@@ -43,37 +48,55 @@ def _keyword_support_mask(df: pd.DataFrame) -> pd.Series:
     types = df.get("types", pd.Series(index=df.index, dtype=str)).astype(str).str.lower()
     blob = name + " " + addr + " " + types
     include = blob.str.contains(PAT_INCLUDE)
-    exclude = blob.str_contains(PAT_EXCLUDE) if hasattr(blob, "str_contains") else blob.str.contains(PAT_EXCLUDE)
+    exclude = blob.str.contains(PAT_EXCLUDE)
     allow = blob.apply(lambda x: any(a in x for a in ALLOWLIST))
     return (include | allow) & (~exclude)
 
-
+# --------------------------
+# Main render function
+# --------------------------
 def render(lat, lon, dguid, gdf_physio, gdf_hospitals):
     st.header("🏥 Support Facilities (Hospitals & Walk-in Clinics)")
 
     # --------------------------
-    # Sidebar: Support controls
+    # Inline Filters (instead of sidebar)
     # --------------------------
-    with st.sidebar:
-        st.markdown("### 🟩 Support controls")
-        radius_km = st.slider("Search radius (km) — support", 0.5, 5.0, 2.0, 0.5, key="supp_radius")
-        comparison_method = st.radio(
-            "GTA comparison method (support)",
-            ["Use GTA Median", "Use GTA Mean"],
-            index=0,
-            key="supp_gta_method",
-        )
-        dedup = st.checkbox("Deduplicate by Name + Address", value=True, key="supp_dedup")
-        apply_filter = st.checkbox(
-            "Filter to Hospitals/Walk-ins only (keyword-based)",
-            value=False,
-            help="Turn ON to filter by keywords. Turn OFF to show everything in hospitals GeoJSON.",
-            key="supp_filter",
-        )
-        st.divider()
+    with st.container():
+        st.subheader("🔍 Filter Support Facilities")
+        col1, col2, col3, col4 = st.columns([1, 1, 1.2, 1])
+
+        with col1:
+            radius_km = st.slider(
+                "Search radius (km)",
+                0.5, 5.0, 2.0, 0.5,
+                key="supp_radius_main"
+            )
+        with col2:
+            comparison_method = st.radio(
+                "GTA comparison",
+                ["Use GTA Median", "Use GTA Mean"],
+                index=0,
+                key="supp_gta_method_main",
+                horizontal=True
+            )
+        with col3:
+            dedup = st.checkbox(
+                "Deduplicate by Name + Address",
+                value=True,
+                key="supp_dedup_main"
+            )
+        with col4:
+            apply_filter = st.checkbox(
+                "Hospitals/Walk-ins only",
+                value=False,
+                help="Turn ON to filter only hospital/walk-in facilities.",
+                key="supp_filter_main"
+            )
+
+    st.markdown("---")
 
     # --------------------------
-    # Prep data
+    # Data preparation
     # --------------------------
     supp = _ensure_lat_lon(gdf_hospitals)
     phys = _ensure_lat_lon(gdf_physio)
@@ -99,33 +122,38 @@ def render(lat, lon, dguid, gdf_physio, gdf_hospitals):
     nearby_physios = phys[phys["Distance_km"] <= radius_km].copy()
 
     st.caption(
-        f"Support rows: {len(gdf_hospitals)} → after dedup/filter: {len(supp)} → within {radius_km} km: {len(nearby_support)}"
+        f"Total facilities: {len(gdf_hospitals)} → after dedup/filter: {len(supp)} → within {radius_km} km: {len(nearby_support)}"
         + (" | filter=ON" if apply_filter else " | filter=OFF")
     )
 
     # --------------------------
-    # Metrics
+    # Summary Metrics
     # --------------------------
     st.subheader("📊 Summary Metrics")
+
     num_support = int(len(nearby_support))
     num_physios = int(len(nearby_physios))
     ratio_sel = (num_support / num_physios) if num_physios > 0 else np.nan
     nearest_km = float(nearby_support["Distance_km"].min()) if num_support > 0 else np.nan
     support_index = float((1.0 / (1.0 + nearby_support["Distance_km"])).sum()) if num_support > 0 else 0.0
 
+    # GTA baselines
     support_counts = supp.groupby("DGUID").size().rename("Support_Count")
     physio_counts = phys.groupby("DGUID").size().rename("Physio_Count")
     aligned = pd.DataFrame({"Support_Count": support_counts}).join(physio_counts, how="outer").fillna(0)
     with np.errstate(divide="ignore", invalid="ignore"):
         aligned["SupportPerPhysio"] = np.where(
-            aligned["Physio_Count"] > 0, aligned["Support_Count"] / aligned["Physio_Count"], np.nan
+            aligned["Physio_Count"] > 0,
+            aligned["Support_Count"] / aligned["Physio_Count"],
+            np.nan
         )
 
     agg = "median" if "median" in comparison_method.lower() else "mean"
     gta_support = getattr(aligned["Support_Count"], agg)(skipna=True)
     gta_ratio = getattr(aligned["SupportPerPhysio"], agg)(skipna=True)
 
-    def arrow_color(d): return ("⬆️", "green") if d > 0 else ("⬇️", "red")
+    def arrow_color(d):
+        return ("⬆️", "green") if d > 0 else ("⬇️", "red")
 
     c1, c2 = st.columns(2)
     c1.metric("Support Facilities Nearby", num_support)
@@ -150,32 +178,35 @@ def render(lat, lon, dguid, gdf_physio, gdf_hospitals):
     c4.metric("Distance-Weighted Support Index", f"{support_index:.2f}")
 
     # --------------------------
-    # Map (same style as competitors)
+    # Map Visualization
     # --------------------------
     st.subheader("🗺️ Map of Support Facilities & Your Location")
 
-    support_layer = pdk.Layer(
-        "ScatterplotLayer",
-        data=nearby_support.rename(columns={"Latitude": "lat", "Longitude": "lon"}),
-        get_position="[lon, lat]",
-        get_color="[255, 0, 0]",   # red = support facilities
-        get_radius=25,
-    )
-    you_layer = pdk.Layer(
-        "ScatterplotLayer",
-        data=pd.DataFrame([{"lat": lat, "lon": lon}]),
-        get_position="[lon, lat]",
-        get_color="[0, 128, 255]",  # blue = your location
-        get_radius=35, 
-    )
-    view_state = pdk.ViewState(latitude=lat, longitude=lon, zoom=13, pitch=0)
-    st.pydeck_chart(
-        pdk.Deck(
-            map_style="mapbox://styles/mapbox/streets-v12",
-            initial_view_state=view_state,
-            layers=[support_layer, you_layer],
+    if not nearby_support.empty:
+        support_layer = pdk.Layer(
+            "ScatterplotLayer",
+            data=nearby_support.rename(columns={"Latitude": "lat", "Longitude": "lon"}),
+            get_position="[lon, lat]",
+            get_color="[255, 0, 0]",   # red = hospitals/walk-ins
+            get_radius=25,
         )
-    )
+        you_layer = pdk.Layer(
+            "ScatterplotLayer",
+            data=pd.DataFrame([{"lat": lat, "lon": lon}]),
+            get_position="[lon, lat]",
+            get_color="[0, 128, 255]",  # blue = your location
+            get_radius=35, 
+        )
+        view_state = pdk.ViewState(latitude=lat, longitude=lon, zoom=13, pitch=0)
+        st.pydeck_chart(
+            pdk.Deck(
+                map_style="mapbox://styles/mapbox/streets-v12",
+                initial_view_state=view_state,
+                layers=[support_layer, you_layer],
+            )
+        )
+    else:
+        st.info("No support facilities found within this radius.")
 
     # --------------------------
     # Table
@@ -185,4 +216,7 @@ def render(lat, lon, dguid, gdf_physio, gdf_hospitals):
         st.info("No support facilities found within the selected radius.")
     else:
         cols = [c for c in ["Name", "Address", "Distance_km"] if c in nearby_support.columns]
-        st.dataframe(nearby_support.sort_values("Distance_km")[cols], use_container_width=True)
+        st.dataframe(
+            nearby_support.sort_values("Distance_km")[cols],
+            use_container_width=True
+        )

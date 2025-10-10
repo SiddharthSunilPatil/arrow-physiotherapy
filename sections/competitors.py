@@ -10,29 +10,51 @@ import matplotlib.pyplot as plt
 def render(gdf_physio, dguid, lat, lon, df_reduced):
     st.header("🏥 Nearby Competitors (Physio Clinics)")
 
-    # --------------------------
-    # Sidebar: Competitors controls
-    # --------------------------
-    # --- Sidebar: Competitor controls (REPLACE your current sidebar block) ---
-    st.sidebar.header("🔍 Filter Nearby Clinics")
-    radius_km = st.sidebar.slider(
-        "Search radius (km)", min_value=0.5, max_value=5.0, step=0.5, value=2.0, key="comp_radius_km"
-    )
-    min_rating = st.sidebar.slider(
-        "Minimum rating", min_value=1.0, max_value=5.0, value=3.5, step=0.1, key="comp_min_rating"
-    )
-    gta_method = st.sidebar.radio(
-        "GTA comparison method",
-        ["Use GTA Median", "Use GTA Mean"],
-        index=0,
-        key="comp_gta_method",
-    )
-    comparison_method = gta_method 
-    dedup = st.sidebar.checkbox("Deduplicate by Name + Address", value=True, key="comp_dedup")
+    # ---------------------------------------------------------
+    # Inline Filters (replacing sidebar)
+    # ---------------------------------------------------------
+    with st.container():
+        st.subheader("🔍 Filter Nearby Clinics")
+        col1, col2, col3, col4 = st.columns([1, 1, 1, 1.2])
 
-    # --------------------------
+        with col1:
+            radius_km = st.slider(
+                "Search radius (km)",
+                min_value=0.5,
+                max_value=5.0,
+                step=0.5,
+                value=2.0,
+                key="comp_radius_km_main",
+            )
+        with col2:
+            min_rating = st.slider(
+                "Minimum rating",
+                min_value=1.0,
+                max_value=5.0,
+                value=3.5,
+                step=0.1,
+                key="comp_min_rating_main",
+            )
+        with col3:
+            gta_method = st.radio(
+                "GTA comparison method",
+                ["Use GTA Median", "Use GTA Mean"],
+                index=0,
+                key="comp_gta_method_main",
+                horizontal=True,
+            )
+        with col4:
+            dedup = st.checkbox(
+                "Deduplicate by Name + Address",
+                value=True,
+                key="comp_dedup_main",
+            )
+
+    st.markdown("---")
+
+    # ---------------------------------------------------------
     # Filter clinics within radius
-    # --------------------------
+    # ---------------------------------------------------------
     input_point = (lat, lon)
 
     def _dist_km(row):
@@ -42,15 +64,14 @@ def render(gdf_physio, dguid, lat, lon, df_reduced):
     gdf_physio["Distance_km"] = gdf_physio.apply(_dist_km, axis=1)
 
     nearby = gdf_physio[gdf_physio["Distance_km"] <= radius_km].copy()
-    combined = (
-        nearby.drop_duplicates(subset=["Name", "Address"])
-        .query("Rating >= @min_rating")
-        .copy()
-    )
+    if dedup:
+        nearby = nearby.drop_duplicates(subset=["Name", "Address"])
 
-    # --------------------------
+    combined = nearby.query("Rating >= @min_rating").copy()
+
+    # ---------------------------------------------------------
     # Data table
-    # --------------------------
+    # ---------------------------------------------------------
     st.subheader("📍 Filtered Nearby Clinics")
     if combined.empty:
         st.info("No clinics match your criteria.")
@@ -60,36 +81,39 @@ def render(gdf_physio, dguid, lat, lon, df_reduced):
             use_container_width=True,
         )
 
-    # --------------------------
+    # ---------------------------------------------------------
     # Map
-    # --------------------------
+    # ---------------------------------------------------------
     st.subheader("🗺️ Map of Clinics & Your Location")
-    clinics_layer = pdk.Layer(
-        "ScatterplotLayer",
-        data=combined.rename(columns={"Latitude": "lat", "Longitude": "lon"}),
-        get_position="[lon, lat]",
-        get_color="[255, 0, 0]",
-        get_radius=25,
-    )
-    input_layer = pdk.Layer(
-        "ScatterplotLayer",
-        data=pd.DataFrame([{"lat": lat, "lon": lon}]),
-        get_position="[lon, lat]",
-        get_color="[0, 128, 255]",
-        get_radius=35,
-    )
-    view_state = pdk.ViewState(latitude=lat, longitude=lon, zoom=13, pitch=0)
-    st.pydeck_chart(
-        pdk.Deck(
-            map_style="mapbox://styles/mapbox/streets-v12",
-            initial_view_state=view_state,
-            layers=[clinics_layer, input_layer],
+    if not combined.empty:
+        clinics_layer = pdk.Layer(
+            "ScatterplotLayer",
+            data=combined.rename(columns={"Latitude": "lat", "Longitude": "lon"}),
+            get_position="[lon, lat]",
+            get_color="[255, 0, 0]",
+            get_radius=25,
         )
-    )
+        input_layer = pdk.Layer(
+            "ScatterplotLayer",
+            data=pd.DataFrame([{"lat": lat, "lon": lon}]),
+            get_position="[lon, lat]",
+            get_color="[0, 128, 255]",
+            get_radius=35,
+        )
+        view_state = pdk.ViewState(latitude=lat, longitude=lon, zoom=13, pitch=0)
+        st.pydeck_chart(
+            pdk.Deck(
+                map_style="mapbox://styles/mapbox/streets-v12",
+                initial_view_state=view_state,
+                layers=[clinics_layer, input_layer],
+            )
+        )
+    else:
+        st.info("No clinics found within this radius.")
 
-    # --------------------------
+    # ---------------------------------------------------------
     # Metrics for selected area
-    # --------------------------
+    # ---------------------------------------------------------
     st.subheader("📊 Competitiveness Metrics")
 
     dguids_in_radius = combined["DGUID"].unique()
@@ -110,9 +134,9 @@ def render(gdf_physio, dguid, lat, lon, df_reduced):
         (total_reviews_sel / total_population) * 1000 if total_population > 0 else np.nan
     )
 
-    # --------------------------
+    # ---------------------------------------------------------
     # Build GTA baselines safely
-    # --------------------------
+    # ---------------------------------------------------------
     df_tmp = df_reduced.copy()
     df_tmp["Population, 2021"] = pd.to_numeric(
         df_tmp["Population, 2021"], errors="coerce"
@@ -154,7 +178,7 @@ def render(gdf_physio, dguid, lat, lon, df_reduced):
             [np.inf, -np.inf], np.nan
         )
 
-    if "median" in comparison_method.lower():
+    if "median" in gta_method.lower():
         gta_pop_per_clinic = df_tmp["PopPerClinic"].median(skipna=True)
         gta_clinics_per_1000 = df_tmp["ClinicsPer1000"].median(skipna=True)
         gta_reviews_per_1000 = df_tmp["ReviewsPer1000"].median(skipna=True)
@@ -222,9 +246,9 @@ def render(gdf_physio, dguid, lat, lon, df_reduced):
     else:
         c4.metric("Reviews per 1,000 People", "N/A")
 
-    # --------------------------
+    # ---------------------------------------------------------
     # GTA comparison histograms
-    # --------------------------
+    # ---------------------------------------------------------
     st.subheader("📈 Comparison to GTA")
 
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))
@@ -246,8 +270,6 @@ def render(gdf_physio, dguid, lat, lon, df_reduced):
         axs[0, 1].axvline(min(selected_clinics_per_1000, 10), color="darkgreen", linestyle="--", label="Selected")
     axs[0, 1].set_xlim(0, 10)
     axs[0, 1].set_title("Clinics per 1,000 People")
-    axs[0, 1].set_xlabel("Clinics per 1,000 People")
-    axs[0, 1].set_ylabel("Number of DGUIDs")
     axs[0, 1].legend()
 
     valid_ratings = df_tmp["Average_Rating"]
@@ -256,8 +278,6 @@ def render(gdf_physio, dguid, lat, lon, df_reduced):
     if pd.notnull(avg_rating_sel):
         axs[1, 0].axvline(avg_rating_sel, color="orange", linestyle="--", label="Selected")
     axs[1, 0].set_title("Average Clinic Rating")
-    axs[1, 0].set_xlabel("Rating")
-    axs[1, 0].set_ylabel("Number of DGUIDs")
     axs[1, 0].legend()
 
     axs[1, 1].hist(df_tmp["ReviewsPer1000"].dropna().clip(upper=1000), bins=20, color="salmon")
@@ -265,8 +285,6 @@ def render(gdf_physio, dguid, lat, lon, df_reduced):
         axs[1, 1].axvline(min(reviews_per_1000_sel, 1000), color="red", linestyle="--", label="Selected")
     axs[1, 1].set_xlim(0, 1000)
     axs[1, 1].set_title("Reviews per 1,000 People")
-    axs[1, 1].set_xlabel("Reviews per 1,000 People")
-    axs[1, 1].set_ylabel("Number of DGUIDs")
     axs[1, 1].legend()
 
     st.pyplot(fig)

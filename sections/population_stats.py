@@ -117,6 +117,50 @@ def render(df_reduced: gpd.GeoDataFrame, dguid: str, lat: float, lon: float):
     # --- KPI Display
     st.subheader("🔑 Key Aggregates (Selected Radius vs GTA)")
 
+    # New code for KPI
+    def kpi(label, val, comp):
+        if val is None or comp is None or pd.isna(val) or pd.isna(comp):
+            st.write(f"**{label}**: —")
+            return
+
+        delta = val - comp
+        arrow = "⬆️" if delta > 0 else ("⬇️" if delta < 0 else "➡️")
+        color = "green" if delta > 0 else ("red" if delta < 0 else "gray")
+
+        low = label.lower()
+        if "income" in low:
+            st.markdown(
+                f"**{label}**<br>${val:,.0f}<br>"
+                f"{arrow} <span style='color:{color}'>{delta:,.0f} vs GTA</span>",
+                unsafe_allow_html=True,
+            )
+        elif "density" in low:
+            st.markdown(
+                f"**{label}**<br>{val:,.1f} ppl/km²<br>"
+                f"{arrow} <span style='color:{color}'>{delta:,.1f} vs GTA</span>",
+                unsafe_allow_html=True,
+            )
+        elif "growth" in low or "%" in low:
+            st.markdown(
+                f"**{label}**<br>{val:+.1f}%<br>"
+                f"{arrow} <span style='color:{color}'>{delta:+.1f}% vs GTA</span>",
+                unsafe_allow_html=True,
+            )
+        elif "population" in low:
+            st.markdown(
+                f"**{label}**<br>{val:,.0f}<br>"
+                f"{arrow} <span style='color:{color}'>{delta:,.0f} vs GTA</span>",
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                f"**{label}**<br>{val:,.2f}<br>"
+                f"{arrow} <span style='color:{color}'>{delta:+.2f} vs GTA</span>",
+                unsafe_allow_html=True,
+            )
+
+    """
+    OLD KPI CODE
     def kpi(label, val, comp):
         if val is None or comp is None or pd.isna(val) or pd.isna(comp):
             st.write(f"**{label}**: —")
@@ -140,6 +184,7 @@ def render(df_reduced: gpd.GeoDataFrame, dguid: str, lat: float, lon: float):
             st.metric(label, f"{val:,.0f}", f"{delta:,.0f} vs GTA", delta_color=delta_color)
         else:
             st.metric(label, f"{val:,.2f}", f"{delta:,.2f} vs GTA", delta_color=delta_color)
+    """
 
     c1, c2, c3, c4, c5 = st.columns(5)
     with c1: kpi("Median income (2020)", agg["Median income (2020)"], gta_avg["Median income (2020)"])
