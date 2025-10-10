@@ -1,13 +1,30 @@
+# Use a base image with system packages support
 FROM python:3.10-slim
 
+# Install geospatial system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gdal-bin \
+    libgdal-dev \
+    libgeos-dev \
+    libproj-dev \
+    proj-data \
+    proj-bin \
+    libexpat1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
 WORKDIR /app
+
+# Copy all files
 COPY . /app
 
-# (Optional) faster, smaller wheels
-ENV PIP_NO_CACHE_DIR=1
-RUN pip install --upgrade pip \
- && pip install -r requirements.txt
+# Upgrade pip and install Python dependencies
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Streamlit must listen on 0.0.0.0:8080 in Cloud Run
+# Expose Streamlit default port
 EXPOSE 8080
+
+# Run the Streamlit app
 CMD ["streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0"]
