@@ -6,6 +6,7 @@ import os
 
 from utils.load_data import load_all_data, load_reviews
 from utils.geospatial import get_dguid_from_latlon
+from pathlib import Path
 
 from sections import population_stats
 from sections import competitors
@@ -16,10 +17,16 @@ st.set_page_config(page_title="Arrow Physio Dashboard", layout="wide")
 st.title("📍 Arrow Physio Market Insights")
 
 def get_gcp_key():
-    # Use secrets.toml locally
-    if "general" in st.secrets and "gcp_api_key" in st.secrets["general"]:
-        return st.secrets["general"]["gcp_api_key"]
-    # Use env var on Cloud Run
+    """Safely load GCP key from secrets.toml (local) or env var (Cloud Run)."""
+    try:
+        # Check if Streamlit secrets file exists
+        secrets_path = Path("/app/.streamlit/secrets.toml")
+        if secrets_path.exists() and "general" in st.secrets and "gcp_api_key" in st.secrets["general"]:
+            return st.secrets["general"]["gcp_api_key"]
+    except FileNotFoundError:
+        pass  # No secrets.toml file on Cloud Run — skip to env var
+
+    # Use environment variable on Cloud Run
     return os.getenv("gcp_api_key")
 
 gcp_api_key = get_gcp_key()
