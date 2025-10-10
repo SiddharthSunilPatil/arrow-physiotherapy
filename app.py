@@ -69,7 +69,7 @@ address_input = st.sidebar.text_input("Enter clinic address", value=st.session_s
 
 # If user typed a new address → geocode immediately
 if address_input != st.session_state.address and address_input.strip() != "":
-    api_key = st.secrets["gcp_api_key"]
+    api_key = gcp_api_key
     lat, lon, formatted_address = geocode_address(address_input, api_key)
 
     if lat and lon:
