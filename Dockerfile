@@ -1,18 +1,33 @@
-# Use a geospatial-ready base image (includes GDAL, PROJ, GEOS, etc.)
-FROM ghcr.io/osgeo/gdal:alpine-small-latest
+FROM python:3.10-slim
 
-# Install Python and build tools
-RUN apk add --no-cache python3 py3-pip py3-numpy py3-pandas py3-requests \
-    py3-geopandas py3-shapely py3-fiona py3-pyproj py3-psycopg2 \
-    g++ && \
-    ln -sf python3 /usr/bin/python && \
-    pip install --no-cache-dir --upgrade pip setuptools wheel
+# Install system dependencies required by geopandas, shapely, fiona, etc.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gdal-bin \
+    libgdal-dev \
+    libgeos-dev \
+    libproj-dev \
+    proj-data \
+    proj-bin \
+    libspatialindex-dev \
+    libexpat1 \
+    && rm -rf /var/lib/apt/lists/*
 
+# Set GDAL/PROJ environment paths (important for Fiona)
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
+ENV GDAL_DATA=/usr/share/gdal
+ENV PROJ_LIB=/usr/share/proj
+
+# Set working directory
 WORKDIR /app
 COPY . /app
 
-# Install only the remaining Python libs not provided above
+# Install Python dependencies
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Expose Streamlit port
 EXPOSE 8080
+
+# Start Streamlit
 CMD ["streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0"]

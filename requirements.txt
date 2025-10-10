@@ -1,13 +1,23 @@
+# Core app dependencies
 streamlit==1.35.0
 pandas==2.2.2
 numpy==1.26.4
 matplotlib==3.9.0
 plotly==5.22.0
+requests==2.32.3
+
+# Geospatial + sentiment
 geopy==2.4.1
 pydeck==0.8.1b0
 vaderSentiment==3.3.2
-requests==2.32.3
+
+# GIS stack (make sure system libs are installed via Dockerfile)
 geopandas==0.14.3
 shapely==2.0.3
+fiona==1.9.6
 pyproj==3.6.1
+rtree==1.3.0
+pyogrio==0.9.0
+
+# Local package (editable install)
 -e .
