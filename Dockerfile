@@ -1,30 +1,18 @@
-# Use a base image with system packages support
-FROM python:3.10-slim
+# Use a geospatial-ready base image (includes GDAL, PROJ, GEOS, etc.)
+FROM ghcr.io/osgeo/gdal:alpine-small-latest
 
-# Install geospatial system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    gdal-bin \
-    libgdal-dev \
-    libgeos-dev \
-    libproj-dev \
-    proj-data \
-    proj-bin \
-    libexpat1 \
-    && rm -rf /var/lib/apt/lists/*
+# Install Python and build tools
+RUN apk add --no-cache python3 py3-pip py3-numpy py3-pandas py3-requests \
+    py3-geopandas py3-shapely py3-fiona py3-pyproj py3-psycopg2 \
+    g++ && \
+    ln -sf python3 /usr/bin/python && \
+    pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Set the working directory
 WORKDIR /app
-
-# Copy all files
 COPY . /app
 
-# Upgrade pip and install Python dependencies
-RUN pip install --upgrade pip
+# Install only the remaining Python libs not provided above
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose Streamlit default port
 EXPOSE 8080
-
-# Run the Streamlit app
 CMD ["streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0"]
