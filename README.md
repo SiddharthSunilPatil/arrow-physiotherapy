@@ -15,7 +15,8 @@ That’s how the **Location Intelligence Dashboard (LID)** was born — a tool t
 ### Url : https://arrow-dashboard-93638475280.us-central1.run.app/
 
 ### Dashboard overview
-![Location Intelligence Dashboard Overview](screenshots/lid-overview.png)
+![Alt text](C:\Users\Siddharth\Dropbox\My PC (LAPTOP-87F55SBU)\Desktop\SIDDHARTH\Evodia Group\Evodia Tech\Arrow Physiotherapy\screenshots\LID Thumbnail.png)
+
 ---
 
 ## 1. Project Overview
