@@ -108,34 +108,34 @@ It was initially built for a physiotherapy clinic in the GTA but designed so it 
 
 **2. Setting up the environment**
 
-2.1. Navigate to the cloned repository: cd <repository-name>
-2.2. Create a virtual environment: conda create -p venv python=3.9 -y
-2.3. Activate the environment: conda activate venv/
+2.1. Navigate to the cloned repository: cd <repository-name>  
+2.2. Create a virtual environment: conda create -p venv python=3.9 -y  
+2.3. Activate the environment: conda activate venv/  
 
 **3. Installing dependencies**
 
-3.1. Install all required dependencies using: pip install -r requirements.txt
+3.1. Install all required dependencies using: pip install -r requirements.txt  
 
 **4. Configuring API keys and secrets**
 
-4.1. Inside the repository, create the following folder if it does not already exist: .streamlit/
-4.2. Inside .streamlit/, create a file named secrets.toml.
-4.3. Add your Google Places API key in the following format:places_api_key = "YOUR_GOOGLE_PLACES_API_KEY"
-⚠️ Note: Do not commit secrets.toml to GitHub
-This file is required for live competitor and hospital lookup
+4.1. Inside the repository, create the following folder if it does not already exist: .streamlit/  
+4.2. Inside .streamlit/, create a file named secrets.toml  
+4.3. Add your Google Places API key in the following format:places_api_key = "YOUR_GOOGLE_PLACES_API_KEY"  
+⚠️ Note: Do not commit secrets.toml to GitHub  
+This file is required for live competitor and hospital lookup  
 
 **5. Verifying data availability**
 
-5.1. Ensure the following data files exist in the data/ directory:
-df_reduced.parquet (Statistics Canada census data)
-gdf_physio_DGUID.parquet (physiotherapy clinics)
-gdf_hospitals_DGUID.parquet (hospitals & walk-in clinics)
+5.1. Ensure the following data files exist in the data/ directory:  
+df_reduced.parquet (Statistics Canada census data)  
+gdf_physio_DGUID.parquet (physiotherapy clinics)  
+gdf_hospitals_DGUID.parquet (hospitals & walk-in clinics)  
 
-These files are preprocessed and required for the dashboard to function correctly.
+These files are preprocessed and required for the dashboard to function correctly.  
 
 **6. Running the application locally**
 
-6.1. Execute the following command to launch the Streamlit app: streamlit run app.py
+6.1. Execute the following command to launch the Streamlit app: streamlit run app.py  
    
 ## Repository Structure
 ```text
