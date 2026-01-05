@@ -38,7 +38,7 @@ That’s how the **Location Intelligence Dashboard (LID)** was born — a tool t
 
 ---
 
-## 1. Project Overview
+## Project Overview
 The Location Intelligence Dashboard is a Streamlit-based, cloud-ready app that lets a clinic owner, operations head, or analyst:
 - enter a location (lat/long),
 - map it to the correct **StatsCan census/DGUID** using geospatial tools,
@@ -49,7 +49,7 @@ It was initially built for a physiotherapy clinic in the GTA but designed so it 
 
 ---
 
-## 2. Key Features
+## Key Features
 - **Census & Demographic Intelligence**  
   Pulls population, age, gender, income, and growth info from preprocessed StatsCan data at a census/DGUID level.
 - **Competitor & Support Mapping**  
@@ -68,7 +68,7 @@ It was initially built for a physiotherapy clinic in the GTA but designed so it 
 
 ---
 
-## 3. Architecture (High Level)
+## Project Architecture (High Level)
 1. **Input**: User enters/selects latitude & longitude.
 2. **Geospatial Mapping**: Location is mapped to the corresponding Statistics Canada DGUID (census geography).
 3. **Data Fetching**:
@@ -88,7 +88,7 @@ It was initially built for a physiotherapy clinic in the GTA but designed so it 
 
 ---
 
-## 4. Tech Stack
+## Tech Stack
 - **Language & App:** Python, Streamlit
 - **Geospatial:** GeoPandas, Shapely, PyDeck, Folium
 - **Data Sources:** Statistics Canada census (preprocessed), Google Places API
@@ -98,7 +98,7 @@ It was initially built for a physiotherapy clinic in the GTA but designed so it 
 
 ---
 
-## 5. Repository Structure
+## Repository Structure
 ```text
 .
 ├── app.py                     # main Streamlit app
