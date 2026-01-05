@@ -2,17 +2,38 @@
 
 # Location Intelligence Dashboard (LID)
 
+## Business Problem
 I was approached by a team of physiotherapists who were planning to open their first clinic in the Greater Toronto Area (GTA). On paper, the GTA looked promising — large population, good incomes, good footfall. But once we started digging, we realized the real problem: **almost every neighbourhood already had clinics**, and each location came with a different challenge — high competition in some areas, weak demographics in others, and in a few cases, very little referral support from nearby hospitals or walk-ins.
 
+## The Solution
 So instead of guessing, we decided to **build a dashboard** that could tell us — for any point in the GTA — “what does the market around this place look like?” After a couple of iterations and requirement-gathering sessions, we arrived at the idea of a **geospatial, data-driven location planner**:
 
 - pull census-level demographics from **Statistics Canada** for the exact area of interest,
 - map nearby **competitor clinics, hospitals, and walk-in centres** via the **Google Places API**,
 - and (later) layer in **sentiment analysis of Google reviews** to understand how existing clinics are performing.
 
-That’s how the **Location Intelligence Dashboard (LID)** was born — a tool to take the guesswork out of clinic expansion. You can check how the dashboard works by clicking on the URL below.
+That’s how the **Location Intelligence Dashboard (LID)** was born — a tool to take the guesswork out of clinic expansion. You can check how the dashboard works by clicking on the URL below or check the screenshots below to see how the dashboard looks.
 
-### Url : https://arrow-dashboard-93638475280.us-central1.run.app/
+## Url : https://arrow-dashboard-93638475280.us-central1.run.app/
+
+## Screenshots
+**User Interface to enter address of imterest and confirm map location**
+![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_001.png)
+
+**Demographic information within selected radius along with GTA metrics comparison**
+![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_002.png)
+
+**Competitor data within selected radius**
+![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_003.png)
+
+**Spatial distribution of competitors and location of interest**
+![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_004.png)
+
+**Feature engineered metrics**
+![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_005.png)
+
+**Patient Sentiment Analysis**
+![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_006.png)
 
 ---
 
