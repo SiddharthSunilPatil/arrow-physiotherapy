@@ -18,7 +18,7 @@ That’s how the **Location Intelligence Dashboard (LID)** was born — a tool t
 
 ## Screenshots
 
-## 1. User Interface to enter address of imterest and confirm map location
+## 1. User Interface to enter address of interest and confirm map location
 ![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_001.png)
 
 ## 2. Demographic information within selected radius along with GTA metrics comparison
@@ -99,20 +99,24 @@ It was initially built for a physiotherapy clinic in the GTA but designed so it 
 ---
 ## Setup Instructions
 **1. Cloning the repository**
+
 1.1. Create a directory on your local drive where you want to store the project.
 1.2. Open Anaconda Prompt (or terminal) and navigate to the directory using: cd <your-directory-path>.
 1.3. Launch VS Code from this directory using: code .
 1.4. Open a new terminal in VS Code and clone the repository using: git clone https://github.com/<your-username>/<repository-name>.git
 
 **2. Setting up the environment**
+
 2.1. Navigate to the cloned repository: cd <repository-name>
 2.2. Create a virtual environment: conda create -p venv python=3.9 -y
 2.3. Activate the environment: conda activate venv/
 
 **3. Installing dependencies**
+
 3.1. Install all required dependencies using: pip install -r requirements.txt
 
 **4. Configuring API keys and secrets**
+
 4.1. Inside the repository, create the following folder if it does not already exist: .streamlit/
 4.2. Inside .streamlit/, create a file named secrets.toml.
 4.3. Add your Google Places API key in the following format:places_api_key = "YOUR_GOOGLE_PLACES_API_KEY"
@@ -120,6 +124,7 @@ It was initially built for a physiotherapy clinic in the GTA but designed so it 
 This file is required for live competitor and hospital lookup
 
 **5. Verifying data availability**
+
 5.1. Ensure the following data files exist in the data/ directory:
 df_reduced.parquet (Statistics Canada census data)
 gdf_physio_DGUID.parquet (physiotherapy clinics)
@@ -128,6 +133,7 @@ gdf_hospitals_DGUID.parquet (hospitals & walk-in clinics)
 These files are preprocessed and required for the dashboard to function correctly.
 
 **6. Running the application locally**
+
 6.1. Execute the following command to launch the Streamlit app: streamlit run app.py
    
 ## Repository Structure
