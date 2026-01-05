@@ -9,8 +9,8 @@ from utils.load_data import load_all_data, load_reviews
 from utils.geospatial import get_dguid_from_latlon
 from sections import population_stats, competitors, hospitals, sentiment_physio
 
-st.set_page_config(page_title="Arrow Physio Dashboard", layout="wide")
-st.title("📍 Arrow Physio Market Insights")
+st.set_page_config(page_title="Healthcare Location Intelligence Dashboard", layout="wide")
+st.title("📍 Healthcare Location Intelligence Dashboard")
 
 def get_gcp_key():
     """Safely load GCP key from secrets.toml (local) or env var (Cloud Run)."""
@@ -48,7 +48,7 @@ st.subheader("🏠 Step 1: Enter Clinic Address")
 address_input = st.text_input(
     "Enter clinic address",
     value=st.session_state.address,
-    placeholder="e.g. 125 Bronte Rd, Oakville"
+    placeholder="e.g. 100 City Centre Drive, Oakville"
 )
 
 if address_input != st.session_state.address and address_input.strip():
