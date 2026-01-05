@@ -98,12 +98,13 @@ It was initially built for a physiotherapy clinic in the GTA but designed so it 
 
 ---
 ## Setup Instructions
+
 **1. Cloning the repository**
 
-1.1. Create a directory on your local drive where you want to store the project.
-1.2. Open Anaconda Prompt (or terminal) and navigate to the directory using: cd <your-directory-path>.
+1.1. Create a directory on your local drive where you want to store the project .
+1.2. Open Anaconda Prompt (or terminal) and navigate to the directory using: cd <your-directory-path> .
 1.3. Launch VS Code from this directory using: code .
-1.4. Open a new terminal in VS Code and clone the repository using: git clone https://github.com/<your-username>/<repository-name>.git
+1.4. Open a new terminal in VS Code and clone the repository using: git clone https://github.com/<your-username>/<repository-name>.git .
 
 **2. Setting up the environment**
 
