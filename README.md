@@ -17,22 +17,23 @@ That’s how the **Location Intelligence Dashboard (LID)** was born — a tool t
 ## Url : https://arrow-dashboard-93638475280.us-central1.run.app/
 
 ## Screenshots
-**User Interface to enter address of imterest and confirm map location**
+
+## 1. User Interface to enter address of imterest and confirm map location
 ![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_001.png)
 
-**Demographic information within selected radius along with GTA metrics comparison**
+## 2. Demographic information within selected radius along with GTA metrics comparison
 ![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_002.png)
 
-**Competitor data within selected radius**
+## 3. Competitor data within selected radius
 ![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_003.png)
 
-**Spatial distribution of competitors and location of interest**
+## 4. Spatial distribution of competitors and location of interest
 ![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_004.png)
 
-**Feature engineered metrics**
+## 5. Feature engineered metrics
 ![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_005.png)
 
-**Patient Sentiment Analysis**
+## 6. Patient Sentiment Analysis
 ![image](https://github.com/SiddharthSunilPatil/arrow-physiotherapy/blob/main/screenshots/Screenshot_006.png)
 
 ---
