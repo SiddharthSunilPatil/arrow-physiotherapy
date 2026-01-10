@@ -72,7 +72,8 @@ if st.session_state.lat and st.session_state.lon:
     if st.button("🔍 Run Market Analysis"):
         st.session_state.run_analysis = True
 else:
-    st.info("ℹ️ Type an address above to see map preview.")
+    st.info("ℹ️ Type an address above from Mississauga, Burlington, Oakville or Etobicoke to see map preview. " \
+    "Some sample addresses: 5100 Erin Mills Pkwy, 240 Leighland Ave, 777 Guelph Line, 250 The East Mall")
 
 # ------------------------- ANALYSIS -------------------------
 
