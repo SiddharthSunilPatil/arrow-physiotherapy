@@ -1,6 +1,4 @@
-## Arrow Physiotherapy 
-
-# Location Intelligence Dashboard (LID)
+# Healthcare Location Intelligence Dashboard (LID)
 
 ## Business Problem
 I was approached by a team of physiotherapists who were planning to open their first clinic in the Greater Toronto Area (GTA). On paper, the GTA looked promising — large population, good incomes, good footfall. But once we started digging, we realized the real problem: **almost every neighbourhood already had clinics**, and each location came with a different challenge — high competition in some areas, weak demographics in others, and in a few cases, very little referral support from nearby hospitals or walk-ins.
